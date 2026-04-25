@@ -12,18 +12,15 @@ npx serve .
 
 ## Deploy to Vercel
 
-1. Create a new GitHub repo named `binary-timber-site`
-2. Push this directory to it:
-   ```bash
-   git init
-   git add .
-   git commit -m "initial commit"
-   git remote add origin https://github.com/YOUR_USER/binary-timber-site.git
-   git push -u origin main
-   ```
-3. Go to [vercel.com](https://vercel.com) → **Add New Project** → import the repo
-4. Vercel auto-detects a static site — click **Deploy**
-5. Connect your custom domain under **Project Settings → Domains**
+This repo is connected to Vercel — every push to `main` triggers an automatic deployment.
+
+```bash
+git add .
+git commit -m "your message"
+git push origin main
+```
+
+To connect a custom domain: **Vercel dashboard → Project → Settings → Domains**.
 
 ## TODO: set up the contact form
 
@@ -54,7 +51,7 @@ the output into `public/`.
 ## File structure
 
 ```
-binary-timber-site/
+binary-timber/
 ├── index.html          main page
 ├── css/
 │   └── styles.css      all styles
