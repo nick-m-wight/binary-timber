@@ -221,17 +221,8 @@
         </div>
       </div>
 
-      <!--
-        Contact form — powered by Web3Forms (https://web3forms.com)
-        Replace REPLACE_ME with your access key from web3forms.com
-        See README for full setup instructions.
-      -->
       <form class="reveal" id="contactForm" aria-label="Contact form"
-            action="https://api.web3forms.com/submit" method="POST" novalidate>
-
-        <input type="hidden" name="access_key" value="REPLACE_ME">
-        <input type="hidden" name="subject" value="New Inquiry — Binary Timber Holdings">
-        <input type="hidden" name="from_name" value="Binary Timber Website">
+            action="/api/contact" method="POST" novalidate>
 
         <!-- Honeypot: hidden from real users, catches bots -->
         <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" aria-hidden="true">
