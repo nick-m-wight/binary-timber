@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" fill="#1a1612" rx="2"/>
+  <!-- Terminal-green diagonal accent (matches .logo-mark::after) -->
+  <polygon points="16,0 32,0 32,16" fill="#2d8659" opacity="0.4"/>
+  <!-- BT logotype -->
+  <text x="4" y="22" font-family="monospace" font-size="14" font-weight="700" fill="#faf6ec" letter-spacing="-0.5">BT</text>
+</svg>
