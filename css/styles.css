@@ -81,26 +81,9 @@ nav {
   color: var(--ink);
 }
 
-.logo-mark {
-  width: 28px; height: 28px;
-  background: var(--ink);
-  color: var(--bg);
-  display: grid;
-  place-items: center;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.logo-mark::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, transparent 50%, var(--terminal) 50%);
-  opacity: 0.4;
+.logo-img {
+  height: 36px;
+  width: auto;
 }
 
 nav ul {
