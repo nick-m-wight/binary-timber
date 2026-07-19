@@ -55,6 +55,7 @@
   <ul>
     <li><a href="#about">About</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#showcase">Showcase</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -157,40 +158,190 @@
           <span>2025</span>
         </div>
         <h3>ChefHub</h3>
-        <p>AI-powered culinary platform — built and deployed on Vercel.</p>
+        <p>AI-powered culinary marketplace and streaming platform connecting home cooks with professional chefs — live streaming, bookings, and Claude-parsed recipes, built and deployed on Vercel.</p>
         <a class="project-link" href="https://chefhub.dev" target="_blank" rel="noopener noreferrer">chefhub.dev →</a>
         <br>
         <a class="project-link" href="https://github.com/nick-m-wight/chef-hub" target="_blank" rel="noopener noreferrer">GitHub →</a>
       </div>
 
-      <!-- TODO: replace with real Timber Trace Origins content -->
-      <div class="project reveal">
-        <div class="project-meta">
-          <span class="type-cnc">// CNC Manufacturing</span>
-          <span>Coming Soon</span>
-        </div>
-        <h3>Timber Trace Origins</h3>
-        <p><!-- TODO: add project description --></p>
-      </div>
-
-      <!-- TODO: replace with real projects -->
+      <!-- NOTE: repo is private as of writing — link goes live once it's flipped to public -->
       <div class="project reveal">
         <div class="project-meta">
           <span class="type-ai">// AI Software</span>
           <span>2026</span>
         </div>
-        <h3>Domain-Specific Models</h3>
-        <p>Fine-tuned model deployments for narrow, high-stakes use cases where general-purpose tools fall short.</p>
+        <h3>Quiet Trader</h3>
+        <p>A nonprofit trading-alert marketplace — build alerts from real indicators, track public performance, and follow a nightly AI-ranked leaderboard. Optional auto-execute via Alpaca, paper or live.</p>
+        <a class="project-link" href="https://quiet-trader.vercel.app/" target="_blank" rel="noopener noreferrer">quiet-trader.vercel.app →</a>
+        <br>
+        <a class="project-link" href="https://github.com/nick-m-wight/quiet-trader" target="_blank" rel="noopener noreferrer">GitHub →</a>
+        <p class="project-disclaimer">// nonprofit platform — no financial advice given; alerts are user-generated signals, not licensed investment guidance</p>
       </div>
 
-      <!-- TODO: replace with real projects -->
+      <div class="project reveal">
+        <div class="project-meta">
+          <span class="type-ai">// AI Software</span>
+          <span>2026</span>
+        </div>
+        <h3>tech-garden</h3>
+        <p>A smart-glasses home &amp; garden assistant — voice commands hit Home Assistant, and a photo of a struggling plant gets a Claude Vision diagnosis straight to the companion app.</p>
+        <a class="project-link" href="https://github.com/nick-m-wight/tech-garden" target="_blank" rel="noopener noreferrer">GitHub →</a>
+      </div>
+
+      <div class="project reveal">
+        <div class="project-meta">
+          <span class="type-eng">// Hardware / IoT</span>
+          <span>2026</span>
+        </div>
+        <h3>plant-monitor</h3>
+        <p>A solar-powered ESP32 sensor station — soil moisture, climate, and pressure readings streamed to Home Assistant over MQTT. No AI here, just clean embedded engineering.</p>
+        <a class="project-link" href="https://github.com/nick-m-wight/plant-monitor" target="_blank" rel="noopener noreferrer">GitHub →</a>
+      </div>
+
+      <div class="project reveal">
+        <div class="project-meta">
+          <span class="type-eng">// Systems Engineering</span>
+          <span>2026</span>
+        </div>
+        <h3>Agent Sync Engine</h3>
+        <p>A production-grade bidirectional sync layer between a chat platform and a business phone system — real-time webhook handling, idempotent event processing, and unified agent presence across both.</p>
+        <a class="project-link" href="https://github.com/nick-m-wight/livechat-ringcentral-sync" target="_blank" rel="noopener noreferrer">GitHub →</a>
+      </div>
+
       <div class="project reveal">
         <div class="project-meta">
           <span class="type-cnc">// CNC Manufacturing</span>
           <span>2026</span>
         </div>
-        <h3>Custom Hardware Fabrication</h3>
-        <p>Bespoke parts and finished goods milled from wood, aluminum, and engineered composites — built to spec.</p>
+        <h3>Timber Trace Origins</h3>
+        <p>Custom CNC-machined wood products — cutting boards, engraved signs, cribbage boards, and folding game tables, precision-cut from quality hardwoods and finished by hand.</p>
+        <a class="project-link" href="https://timbertrace.shop/shop/" target="_blank" rel="noopener noreferrer">timbertrace.shop →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="showcase" aria-labelledby="showcase-heading">
+    <div class="section-header reveal">
+      <div class="section-num">03 / Showcase</div>
+      <h2 id="showcase-heading">How the <span class="italic">AI</span> actually works.</h2>
+      <p class="section-lede">A closer look at five AI integrations from the projects above — shipped code, not demos.</p>
+    </div>
+
+    <div class="showcase-list">
+
+      <div class="showcase-item reveal">
+        <div class="showcase-text">
+          <div class="showcase-tag">// chefhub.dev — recipe parsing</div>
+          <h3>Paste any recipe. Get structured data.</h3>
+          <p>Chefs paste raw recipe text — copied from a blog, a notebook, anywhere — and <strong>Claude Haiku</strong> parses it into structured JSON: ingredients, quantities, steps, and timing, ready to render as a recipe card.</p>
+          <div class="showcase-flow mono">
+            <span>Pasted text</span><span class="arrow">→</span><span class="model">Claude Haiku</span><span class="arrow">→</span><span>Structured recipe</span>
+          </div>
+        </div>
+        <div class="showcase-visual">
+          <div class="visual-card card-code static">
+            <div class="header"><span></span><span></span><span></span></div>
+            <div class="mini-label">// input</div>
+            <div class="dim">"2 cups flour, 1 tsp<br>salt, cream butter &amp;<br>sugar... bake at 350<br>for 25 min"</div>
+            <div class="mini-label">// output</div>
+            <div><span class="keyword">{</span></div>
+            <div>&nbsp;&nbsp;<span class="string">"ingredients"</span>: [...],</div>
+            <div>&nbsp;&nbsp;<span class="string">"steps"</span>: [...],</div>
+            <div>&nbsp;&nbsp;<span class="string">"bake_time"</span>: <span class="string">"25min"</span></div>
+            <div><span class="keyword">}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-item reveal reverse">
+        <div class="showcase-text">
+          <div class="showcase-tag">// chefhub.dev — chef recruitment</div>
+          <h3>Vetting applicants without a human on every call.</h3>
+          <p>New chef applicants record a short intro via an automated <strong>Bland.ai</strong> voice call. The call gets an AI score, a <strong>Checkr</strong> background check runs in parallel, and both feed a single approval queue.</p>
+          <div class="showcase-flow mono">
+            <span>Applicant call</span><span class="arrow">→</span><span class="model">AI score</span><span class="arrow">→</span><span>+ Checkr check</span><span class="arrow">→</span><span>Approval queue</span>
+          </div>
+        </div>
+        <div class="showcase-visual">
+          <div class="visual-card card-code static">
+            <div class="header"><span></span><span></span><span></span></div>
+            <div><span class="comment">// chef_recruit.pipeline()</span></div>
+            <div>applicant.<span class="keyword">submit</span>()</div>
+            <div>→ bland_ai.call() &nbsp;<span class="string">[ok]</span></div>
+            <div>→ ai.score() &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">92/100</span></div>
+            <div>→ checkr.check() &nbsp;<span class="string">[clear]</span></div>
+            <div>→ status: <span class="string">"approved"</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-item reveal">
+        <div class="showcase-text">
+          <div class="showcase-tag">// tech-garden — plant diagnosis</div>
+          <h3>A photo in, a diagnosis out.</h3>
+          <p>Press the button on the glasses to photograph a struggling plant. The image ships to the backend, <strong>Claude Vision</strong> analyzes it, and the diagnosis lands in the plant's history on the phone app — analysis is optional, so photos still save fine without it.</p>
+          <div class="showcase-flow mono">
+            <span>Glasses photo</span><span class="arrow">→</span><span class="model">Claude Vision</span><span class="arrow">→</span><span>Diagnosis in app</span>
+          </div>
+        </div>
+        <div class="showcase-visual">
+          <div class="visual-card card-code static">
+            <div class="header"><span></span><span></span><span></span></div>
+            <div><span class="comment">// glasses.capture()</span></div>
+            <div>photo.<span class="keyword">upload</span>()</div>
+            <div>→ claude.vision(photo)</div>
+            <div>→ diagnosis:</div>
+            <div>&nbsp;&nbsp;<span class="string">"early signs of</span></div>
+            <div>&nbsp;&nbsp;<span class="string">powdery mildew"</span></div>
+            <div>→ app.notify(owner)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-item reveal reverse">
+        <div class="showcase-text">
+          <div class="showcase-tag">// quiet trader — nightly leaderboard</div>
+          <h3>Ranked by results, not by who paid.</h3>
+          <p>Every night, <strong>Claude Sonnet</strong> scans the public performance of every published alert on the platform and re-ranks the leaderboard. No paid placement — the ranking is the AI's read of what's actually working.</p>
+          <div class="showcase-flow mono">
+            <span>Alert performance</span><span class="arrow">→</span><span class="model">Claude Sonnet</span><span class="arrow">→</span><span>Ranked leaderboard</span>
+          </div>
+        </div>
+        <div class="showcase-visual">
+          <div class="visual-card card-code static">
+            <div class="header"><span></span><span></span><span></span></div>
+            <div><span class="comment">// leaderboard.nightly_scan()</span></div>
+            <div>alerts.<span class="keyword">fetch_performance</span>()</div>
+            <div>→ claude.rank(alerts)</div>
+            <div>→ leaderboard.update()</div>
+            <div>→ top: <span class="string">"cash_in_out_v3"</span></div>
+            <div>&nbsp;&nbsp;<span class="string">+18.4% (90d)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-item reveal">
+        <div class="showcase-text">
+          <div class="showcase-tag">// quiet trader — backtest builder</div>
+          <h3>Describe a strategy. Get a formula.</h3>
+          <p>Users describe a strategy in plain terms and <strong>Claude</strong> turns it into a custom entry/exit formula, evaluated by a secure recursive-descent parser — no <code>eval()</code> — then run against historical data.</p>
+          <div class="showcase-flow mono">
+            <span>Strategy description</span><span class="arrow">→</span><span class="model">Claude</span><span class="arrow">→</span><span>Formula + backtest</span>
+          </div>
+        </div>
+        <div class="showcase-visual">
+          <div class="visual-card card-code static">
+            <div class="header"><span></span><span></span><span></span></div>
+            <div><span class="comment">// backtest.ai_formula()</span></div>
+            <div>user.<span class="keyword">describe</span>(strategy)</div>
+            <div>→ claude.parse(strategy)</div>
+            <div>→ formula:</div>
+            <div>&nbsp;&nbsp;<span class="string">"RSI(14) &lt; 30 AND</span></div>
+            <div>&nbsp;&nbsp;<span class="string">SMA(20) &gt; SMA(50)"</span></div>
+            <div>→ backtest.run(formula)</div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -198,7 +349,7 @@
 
   <section class="contact" id="contact" aria-labelledby="contact-heading">
     <div class="section-header reveal">
-      <div class="section-num">03 / Contact</div>
+      <div class="section-num">04 / Contact</div>
       <h2 id="contact-heading">Let's <span class="italic">build</span> something.</h2>
     </div>
 
