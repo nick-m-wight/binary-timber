@@ -127,9 +127,15 @@ the Trust Services Criteria (mostly **Security / Common Criteria**).
 - [ ] Server-side authorization checks on every mutating action (never trust the client).
 
 **Secrets & configuration**
-- [ ] All secrets in Vercel/Supabase env vars; `.env*` gitignored (verify).
-- [ ] Secret scanning in CI (`gitleaks`) to block committed keys.
+- [x] All secrets in Vercel/Supabase env vars; `.env*` gitignored.
+- [x] Secret scanning in CI (`gitleaks`) + GitHub secret scanning & push protection.
 - [ ] Documented key-rotation procedure; separate keys per environment.
+- [x] Business credentials (dashboard logins, DB passwords, API key backups) kept in a
+      dedicated space in the password manager, separate from personal items — currently
+      a folder in personal Bitwarden. **Note:** a folder is organizational only, not an
+      access-control boundary (can't be shared independently). Migrate to a Bitwarden
+      Organization + Collection the moment a second person (contractor, co-founder) needs
+      access to any business system.
 
 **Software supply chain**
 - [ ] Lockfile committed; Dependabot/Renovate for updates.
