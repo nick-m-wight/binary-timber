@@ -1,5 +1,23 @@
-.DS_Store
+# dependencies
 node_modules/
+.pnpm-store/
+
+# next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+*.tsbuildinfo
+
+# secrets & env — never commit real values (see docs/SCOPING.md §4)
 .env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
 .vscode/
 *.log
