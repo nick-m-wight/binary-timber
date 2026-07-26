@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 
 const RESEND_API = "https://api.resend.com/emails";
 
+// Logo for the notification email. Must be an absolute, public HTTPS URL — email
+// clients can't load relative paths or embedded images. Resolves once the app is
+// live on production (binarytimber.com serves /public assets at the root).
+const EMAIL_LOGO_URL = "https://binarytimber.com/email-logo.png";
+
 function escapeHtml(str: unknown): string {
   return String(str ?? "")
     .replace(/&/g, "&amp;")
@@ -31,6 +36,7 @@ export async function POST(req: Request) {
 
   const html = `
     <div style="font-family:Georgia,serif;max-width:600px;color:#1a1612;">
+      <img src="${EMAIL_LOGO_URL}" alt="Binary Timber Holdings" width="240" style="width:240px;max-width:100%;height:auto;display:block;margin-bottom:1.5rem;">
       <h2 style="font-size:1.2rem;margin-bottom:1.5rem;">
         New inquiry via binarytimber.com
       </h2>
