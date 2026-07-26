@@ -1,67 +1,73 @@
-# Binary Timber Holdings — Website
+# Binary Timber Holdings
 
-Static marketing site for Binary Timber Holdings, LLC. Deployed on Vercel.
+Marketing site for Binary Timber Holdings, LLC — evolving into an authenticated
+**customer intake + portal** and internal **CRM**. Built with Next.js (App Router)
+and deployed on Vercel.
+
+See **[docs/SCOPING.md](docs/SCOPING.md)** for the architecture, data model, security
+posture (SOC 2-aligned, OWASP Top 10 / ASVS L1), and phased roadmap.
+
+## Stack
+
+- **Next.js 15** (App Router, TypeScript) on **Vercel**
+- **pnpm** (pinned via `packageManager`; run through Corepack)
+- Supabase (auth + Postgres + RLS) — _added in Phase 2_
 
 ## Local development
 
-No build step required — just open `index.html` in a browser, or use a simple static server:
+pnpm is pinned in `package.json`. If pnpm isn't on your PATH, run it through
+Corepack (bundled with Node ≥ 20) — no global install needed:
 
 ```bash
-npx serve .
+corepack pnpm@11.17.0 install
+corepack pnpm@11.17.0 dev
 ```
 
-## Deploy to Vercel
+If `corepack enable` works on your machine (may need admin on Windows), you can drop
+the prefix and just use `pnpm install`, `pnpm dev`, etc.
 
-This repo is connected to Vercel — every push to `main` triggers an automatic deployment.
+The dev server runs at http://localhost:3000.
 
-```bash
-git add .
-git commit -m "your message"
-git push origin main
-```
+### Scripts
 
-To connect a custom domain: **Vercel dashboard → Project → Settings → Domains**.
+| Command | What it does |
+|---------|--------------|
+| `pnpm dev` | Start the dev server |
+| `pnpm build` | Production build |
+| `pnpm start` | Serve the production build |
+| `pnpm lint` | ESLint (Next core-web-vitals) |
+| `pnpm typecheck` | `tsc --noEmit` |
 
-## TODO: set up the contact form
+## Environment variables
 
-1. Sign up (free) at [web3forms.com](https://web3forms.com)
-2. Create an access key for your receiving email address
-3. In `index.html`, find the line:
-   ```html
-   <input type="hidden" name="access_key" value="REPLACE_ME">
-   ```
-   Replace `REPLACE_ME` with your key, commit, and push — Vercel auto-deploys.
+Copy `.env.example` → `.env.local` and fill in real values. **Never commit
+`.env.local`** — all `.env*` files are gitignored except the example.
 
-## TODO: swap in a real OG image
+- `RESEND_API_KEY` — transactional email for the contact form.
 
-Replace `public/og-image.png` with a 1200×630 PNG and update the `og:image` / `twitter:image`
-meta tag URLs in `index.html` with your confirmed domain.
+## Deploy
 
-## TODO: confirm domain & email
+Connected to Vercel; every push to `main` auto-deploys. Vercel auto-detects Next.js
+(no `vercel.json` needed). Set environment variables in **Vercel → Project → Settings
+→ Environment Variables**.
 
-Search `index.html` for `TODO:` comments — there are three spots for domain and email
-placeholders that need real values before launch.
+## CI & security
 
-## TODO: generate full favicon set
+`.github/workflows/ci.yml` runs on every push and PR:
 
-A base SVG is at `public/favicon.svg`. To generate `.ico` and `apple-touch-icon.png`,
-upload the SVG to [realfavicongenerator.net](https://realfavicongenerator.net) and drop
-the output into `public/`.
+- **Lint · Typecheck · Build**
+- **Production dependency audit** (`pnpm audit --prod --audit-level=high`) — blocking
+- **Full audit** — informational
+- **Secret scan** (gitleaks) over history / PR diff
 
-## File structure
+`main` should be protected (require PR review + passing CI, no direct pushes). See
+`docs/SCOPING.md` §4.
 
-```
-binary-timber/
-├── index.html          main page
-├── css/
-│   └── styles.css      all styles
-├── js/
-│   └── main.js         scroll reveal + contact form handler
-├── public/
-│   ├── favicon.svg     base favicon (BT logo mark)
-│   ├── favicon.ico     TODO: generate from favicon.svg
-│   ├── apple-touch-icon.png  TODO: generate from favicon.svg
-│   └── og-image.png    TODO: replace with real 1200×630 image
-├── .gitignore
-└── README.md
-```
+## Remaining launch TODOs
+
+- Verify `binarytimber.com` in Resend (DNS records go in the **Vercel** dashboard —
+  the domain uses Vercel nameservers), then set `RESEND_FROM=hello@binarytimber.com`
+  in Vercel env vars. No code change needed. See `docs/SCOPING.md` §8.
+- Replace `public/hort.png` OG image with a confirmed 1200×630 asset if desired.
+- Generate the full favicon set (`favicon.ico`, `apple-touch-icon.png`) from
+  `public/favicon.svg` via [realfavicongenerator.net](https://realfavicongenerator.net).

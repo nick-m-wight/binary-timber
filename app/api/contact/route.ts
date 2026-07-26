@@ -1,27 +1,32 @@
-const RESEND_API = 'https://api.resend.com/emails';
+import { NextResponse } from "next/server";
 
-function escapeHtml(str) {
-  return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+const RESEND_API = "https://api.resend.com/emails";
+
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+export async function POST(req: Request) {
+  let payload: Record<string, unknown>;
+  try {
+    payload = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, email, interest, message, botcheck } = req.body ?? {};
+  const { name, email, interest, message, botcheck } = payload ?? {};
 
   // Honeypot — bots fill hidden fields, humans don't
   if (botcheck) {
-    return res.status(200).json({ success: true });
+    return NextResponse.json({ success: true });
   }
 
   if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
   const html = `
@@ -52,14 +57,16 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(RESEND_API, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: 'hello@chefhub.dev',  // TODO: update to hello@binarytimber.com once domain is in Resend
-        to: 'nick.m.wight@gmail.com',
+        // Set RESEND_FROM=hello@binarytimber.com in env once the domain is verified
+        // in Resend. Falls back to the current verified sender until then. See docs/SCOPING.md §8.
+        from: process.env.RESEND_FROM || "hello@chefhub.dev",
+        to: "nick.m.wight@gmail.com",
         reply_to: email,
         subject: `New inquiry — ${escapeHtml(interest)} — Binary Timber Holdings`,
         html,
@@ -69,13 +76,12 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (response.ok) {
-      return res.status(200).json({ success: true });
-    } else {
-      console.error('Resend error:', data);
-      return res.status(500).json({ error: 'Failed to send' });
+      return NextResponse.json({ success: true });
     }
+    console.error("Resend error:", data);
+    return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   } catch (err) {
-    console.error('Contact handler error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Contact handler error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

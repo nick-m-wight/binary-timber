@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: the pipeline only needs to read the repo.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint · Typecheck · Build · Audit
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      # Uses the pnpm version pinned in package.json "packageManager".
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+
+      # Blocking: anything that ships to users must be clean at high+ severity.
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level=high
+
+      # Informational: dev-tooling advisories are surfaced but don't block.
+      - name: Audit all dependencies (informational)
+        run: pnpm audit --audit-level=moderate || true
+
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Scans full history on push and the PR diff on pull_request.
+      # Note: gitleaks-action needs a GITLEAKS_LICENSE only for GitHub *organizations*,
+      # not personal accounts. Add it as a repo secret if this repo moves to an org.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -237,7 +237,7 @@ site keeps working throughout.
 | # | Decision | Notes |
 |---|----------|-------|
 | 1 | Production domain: **`binarytimber.com`** (confirmed) | Needed for auth redirect URLs + email `from`. |
-| 2 | Transactional email `from` | **Migrate to `hello@binarytimber.com`.** Task: verify `binarytimber.com` as a sending domain in Resend (add SPF/DKIM/DMARC DNS records), then flip the `from` in code (currently `hello@chefhub.dev`). Do **not** change code until Resend shows the domain Verified. |
+| 2 | Transactional email `from` | **Migrate to `hello@binarytimber.com`.** Sender is now env-driven (`RESEND_FROM`, defaults to `hello@chefhub.dev`). Task: verify `binarytimber.com` in Resend (SPF/DKIM/DMARC records added in **Vercel** DNS — domain uses `ns1/ns2.vercel-dns.com`), then set `RESEND_FROM=hello@binarytimber.com` in Vercel env vars. No code change/deploy needed to switch. |
 | 3 | Customer sign-up | **Invite-only** ✅ decided — safer early + cleaner SOC 2 story. |
 | 4 | Package manager | **pnpm** ✅ decided. |
 | 5 | Environments | **Separate Supabase projects** for dev vs. prod ✅ decided. |
