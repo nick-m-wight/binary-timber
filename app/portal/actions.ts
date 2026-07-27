@@ -10,6 +10,7 @@ import {
   generateBuildScopeHtml,
   isValidFeatureId,
   isValidPlatformId,
+  FEATURES,
 } from "@/lib/feature-catalog";
 import { escapeHtml, sendEmail, EMAIL_LOGO_URL } from "@/lib/email";
 
@@ -101,6 +102,27 @@ export async function submitIntake(
     ? `<div style="margin-top:1rem;"><strong>Estimated range</strong><p style="margin:0.4rem 0 0;">${formatUSD(payload.estimate.low)} &ndash; ${formatUSD(payload.estimate.high)}</p></div>`
     : "";
 
+  const selectedFeatureDetails = FEATURES.filter((f) => parsed.data.selectedFeatures.includes(f.id));
+  const featuresHtml = selectedFeatureDetails.length
+    ? `
+      <div style="margin-top:1rem;">
+        <strong>Selected features</strong>
+        <table style="width:100%;border-collapse:collapse;margin-top:0.4rem;">
+          ${selectedFeatureDetails
+            .map(
+              (f) => `
+            <tr>
+              <td style="padding:0.3rem 1rem 0.3rem 0;">${escapeHtml(f.label)}</td>
+              <td style="padding:0.3rem 0;white-space:nowrap;color:#3d342a;">${formatUSD(f.priceLow)}&ndash;${formatUSD(f.priceHigh)}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </table>
+      </div>
+    `
+    : "";
+
   const summaryTable = `
     <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
       <tr>
@@ -131,6 +153,7 @@ export async function submitIntake(
               <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">Thanks for reaching out</h2>
               <p>Here's a summary of what you submitted — we'll be in touch soon.</p>
               ${summaryTable}
+              ${featuresHtml}
               ${estimateHtml}
             </div>
           `,
