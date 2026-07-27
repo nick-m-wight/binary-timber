@@ -7,9 +7,17 @@ import { createClient } from "@/lib/supabase/server";
 import {
   computeEstimate,
   generateBuildScope,
+  generateBuildScopeHtml,
   isValidFeatureId,
   isValidPlatformId,
 } from "@/lib/feature-catalog";
+import { escapeHtml, sendEmail, EMAIL_LOGO_URL } from "@/lib/email";
+
+const ADMIN_EMAIL = "nick.m.wight@gmail.com";
+
+function formatUSD(n: number) {
+  return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+}
 
 export type IntakeActionState = { error: string | null };
 
@@ -84,6 +92,71 @@ export async function submitIntake(
 
   if (error) {
     return { error: "Something went wrong. Please try again." };
+  }
+
+  // Notify both sides. Best-effort — the submission already succeeded, so a
+  // failed email here shouldn't fail the whole action or block the customer.
+  const customerEmail = data.claims.email as string | undefined;
+  const estimateHtml = payload.estimate
+    ? `<div style="margin-top:1rem;"><strong>Estimated range</strong><p style="margin:0.4rem 0 0;">${formatUSD(payload.estimate.low)} &ndash; ${formatUSD(payload.estimate.high)}</p></div>`
+    : "";
+
+  const summaryTable = `
+    <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
+      <tr>
+        <td style="padding:0.4rem 1rem 0.4rem 0;font-weight:bold;width:130px;vertical-align:top;">Project</td>
+        <td style="padding:0.4rem 0;">${escapeHtml(payload.projectName)}</td>
+      </tr>
+      <tr>
+        <td style="padding:0.4rem 1rem 0.4rem 0;font-weight:bold;vertical-align:top;">Division</td>
+        <td style="padding:0.4rem 0;">${escapeHtml(payload.division)}</td>
+      </tr>
+      <tr>
+        <td style="padding:0.4rem 1rem 0.4rem 0;font-weight:bold;vertical-align:top;">Description</td>
+        <td style="padding:0.4rem 0;white-space:pre-wrap;">${escapeHtml(payload.description)}</td>
+      </tr>
+    </table>
+  `;
+
+  const emailHeader = `<img src="${EMAIL_LOGO_URL}" alt="Binary Timber Holdings" width="240" style="width:240px;max-width:100%;height:auto;display:block;margin-bottom:1.5rem;">`;
+
+  const results = await Promise.allSettled([
+    customerEmail
+      ? sendEmail({
+          to: customerEmail,
+          subject: "We've received your project inquiry — Binary Timber Holdings",
+          html: `
+            <div style="font-family:Georgia,serif;max-width:600px;color:#1a1612;">
+              ${emailHeader}
+              <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">Thanks for reaching out</h2>
+              <p>Here's a summary of what you submitted — we'll be in touch soon.</p>
+              ${summaryTable}
+              ${estimateHtml}
+            </div>
+          `,
+        })
+      : Promise.resolve({ success: false }),
+    sendEmail({
+      to: ADMIN_EMAIL,
+      replyTo: customerEmail,
+      subject: `New intake submission — ${escapeHtml(payload.projectName)}`,
+      html: `
+        <div style="font-family:Georgia,serif;max-width:600px;color:#1a1612;">
+          ${emailHeader}
+          <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">New intake submission</h2>
+          <p><strong>From:</strong> ${escapeHtml(customerEmail ?? "unknown")}</p>
+          ${summaryTable}
+          ${estimateHtml}
+          ${needsPicker ? generateBuildScopeHtml(parsed.data.selectedFeatures, parsed.data.platform) : ""}
+        </div>
+      `,
+    }),
+  ]);
+
+  for (const r of results) {
+    if (r.status === "rejected" || !r.value.success) {
+      console.error("intake notification email failed:", r.status === "rejected" ? r.reason : "send returned failure");
+    }
   }
 
   revalidatePath("/portal");

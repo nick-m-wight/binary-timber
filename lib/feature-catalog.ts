@@ -170,25 +170,53 @@ export function computeEstimate(featureIds: string[], platformId: string | undef
   return { low, high };
 }
 
-/** Assembles a markdown build-scope brief from selected features — the
- * recommended stack + security checklist to hand off to the dev. */
-export function generateBuildScope(featureIds: string[], platformId: string | undefined): string {
-  const features = FEATURES.filter((f) => featureIds.includes(f.id));
-  const platform = PLATFORMS.find((p) => p.id === platformId);
-
+function collectServicesAndSecurity(featureIds: string[]) {
   const services = new Set<string>();
   const security = new Set<string>();
-  for (const f of features) {
+  for (const f of FEATURES.filter((f) => featureIds.includes(f.id))) {
     f.recommendedServices.forEach((s) => services.add(s));
     f.securityNotes.forEach((s) => security.add(s));
   }
+  return { services: [...services], security: [...security] };
+}
+
+/** Assembles a markdown build-scope brief from selected features — the
+ * recommended stack + security checklist to hand off to the dev. */
+export function generateBuildScope(featureIds: string[], platformId: string | undefined): string {
+  const { services, security } = collectServicesAndSecurity(featureIds);
+  const platform = PLATFORMS.find((p) => p.id === platformId);
 
   const lines: string[] = [];
   lines.push("## Recommended Stack", "");
-  lines.push(...(services.size ? [...services].map((s) => `- ${s}`) : ["- (base build only)"]));
+  lines.push(...(services.length ? services.map((s) => `- ${s}`) : ["- (base build only)"]));
   lines.push("", "## Platform", "", `- ${platform?.label ?? "Web only"}`);
   lines.push("", "## Security Checklist", "");
-  lines.push(...(security.size ? [...security].map((s) => `- [ ] ${s}`) : ["- (none beyond baseline)"]));
+  lines.push(...(security.length ? security.map((s) => `- [ ] ${s}`) : ["- (none beyond baseline)"]));
 
   return lines.join("\n");
+}
+
+/** Same brief, as HTML — for the admin notification email. */
+export function generateBuildScopeHtml(featureIds: string[], platformId: string | undefined): string {
+  const { services, security } = collectServicesAndSecurity(featureIds);
+  const platform = PLATFORMS.find((p) => p.id === platformId);
+  const list = (items: string[], fallback: string) =>
+    `<ul style="margin:0.4rem 0 0;padding-left:1.2rem;">${
+      items.length ? items.map((s) => `<li>${s}</li>`).join("") : `<li>${fallback}</li>`
+    }</ul>`;
+
+  return `
+    <div style="margin-top:1rem;">
+      <strong>Recommended stack</strong>
+      ${list(services, "Base build only")}
+    </div>
+    <div style="margin-top:1rem;">
+      <strong>Platform</strong>
+      <p style="margin:0.4rem 0 0;">${platform?.label ?? "Web only"}</p>
+    </div>
+    <div style="margin-top:1rem;">
+      <strong>Security checklist</strong>
+      ${list(security, "None beyond baseline")}
+    </div>
+  `;
 }
