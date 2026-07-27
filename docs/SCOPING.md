@@ -87,8 +87,12 @@ intake_submissions
   id           uuid  PK default gen_random_uuid()
   customer_id  uuid  FK → auth.users.id
   status       text  enum('new','reviewing','accepted','archived') default 'new'
-  payload      jsonb            -- the intake answers
+  payload      jsonb            -- intake answers + a snapshot of the computed
+                                 -- estimate/buildScope at submit-or-edit time
   created_at   timestamptz default now()
+  updated_at   timestamptz default now()  -- added post-v1: customers can edit their
+                                           -- submission (RLS update policy, resets
+                                           -- status to 'new' on every edit)
 
 project_settings
   id           uuid  PK default gen_random_uuid()
@@ -121,10 +125,12 @@ trail from day one so a future audit (via Vanta/Drata + a CPA firm) is cheap. Ma
 the Trust Services Criteria (mostly **Security / Common Criteria**).
 
 **Access control & auth**
-- [ ] RLS deny-by-default on every table; least-privilege DB roles.
-- [ ] `service_role` key used **only** in server code; never in client bundles.
-- [ ] MFA (TOTP) required for `admin`; offered to customers.
-- [ ] Server-side authorization checks on every mutating action (never trust the client).
+- [x] RLS deny-by-default on every table; least-privilege DB roles.
+- [x] `service_role`/secret key used **only** in server code; never in client bundles.
+- [ ] MFA (TOTP) required for `admin`; offered to customers. **Next up.**
+- [x] Server-side authorization checks on every mutating action (never trust the client)
+      — includes the cost estimate, recomputed server-side from the catalog on every
+      intake submit rather than trusted from the client.
 
 **Secrets & configuration**
 - [x] All secrets in Vercel/Supabase env vars; `.env*` gitignored.
@@ -138,17 +144,19 @@ the Trust Services Criteria (mostly **Security / Common Criteria**).
       access to any business system.
 
 **Software supply chain**
-- [ ] Lockfile committed; Dependabot/Renovate for updates.
-- [ ] CI runs lint + typecheck + tests + `npm audit` + CodeQL on every PR.
-- [ ] Branch protection on `main`: no direct pushes, PR review required, CI must pass.
+- [x] Lockfile committed; Renovate for updates (grouped weekly, auto-merge low-risk).
+- [x] CI runs lint + typecheck + build + `pnpm audit` + CodeQL on every PR.
+- [x] Branch protection on `main`: no direct pushes, PR + passing CI required.
 
 **Data protection**
-- [ ] Encryption at rest (Supabase default) + TLS in transit (Vercel default).
+- [x] Encryption at rest (Supabase default) + TLS in transit (Vercel default).
 - [ ] Data classification + retention policy (`docs/DATA-POLICY.md`, to write).
-- [ ] No PII in application logs; structured logging.
+- [x] No PII in application logs — errors logged are generic (send failures, etc.),
+      not submission content.
 
 **Auditability & operations**
-- [ ] Immutable `audit_log` for sensitive actions.
+- [ ] Immutable `audit_log` for sensitive actions — table + RLS exist (admin-read-only,
+      no client write path), nothing writes to it yet. **Next up, alongside `/admin`.**
 - [ ] Vendor/subprocessor register (Vercel, Supabase, Resend) — `docs/VENDORS.md`.
 - [ ] Incident-response runbook stub — `docs/INCIDENT-RESPONSE.md`.
 
@@ -170,9 +178,14 @@ net-new requirements:
 | A09 Logging/Monitoring Failures | Immutable `audit_log`, structured logs, alerting |
 | A10 SSRF | Validate/whitelist outbound calls; no user-controlled fetch |
 
-Net-new controls this adds to the checklist: **zod validation on every input**,
-**rate-limiting on auth endpoints**, and **secure HTTP response headers** (CSP,
-HSTS, `X-Content-Type-Options`, etc.).
+Net-new controls this adds to the checklist:
+- [x] **zod validation on every input** — implemented for the intake form
+      (`app/portal/actions.ts`); the contact form still uses manual checks and should
+      be brought in line.
+- [ ] **Rate-limiting on auth endpoints** — Supabase Auth has its own built-in limits,
+      but nothing app-specific has been added.
+- [ ] **Secure HTTP response headers** (CSP, HSTS, `X-Content-Type-Options`, etc.) —
+      not yet configured in `next.config.mjs`.
 
 **Reality check:** Full SOC 2 Type II also needs org-level policies (HR, change
 management, risk assessment, ~6–12 months of evidence) and an auditor. Those are
@@ -185,25 +198,39 @@ tracked separately; this repo owns the technical + engineering-process controls.
 Goal: prove the architecture and the security model end to end with the smallest
 possible feature set. Everything else is deferred.
 
-**In scope**
-1. Next.js migration: marketing page served as-is under `/`; app scaffolding in place.
-2. Supabase project + schema + RLS policies above.
-3. Auth: customer sign-up / login / logout; session handling.
-4. Customer can submit **one** intake form → stored in `intake_submissions`.
-5. Customer `/portal` shows their submission + an editable `project_settings` record.
-6. Admin `/admin` lists all submissions (read-only), behind `admin` role + MFA.
-7. `audit_log` writes on intake submit + settings update.
-8. CI pipeline + branch protection + secret scanning.
+**In scope** — status as of this build:
+1. [x] Next.js migration: marketing page served as-is under `/`; app scaffolding in place.
+2. [x] Supabase project + schema + RLS policies above.
+3. [x] Auth: invite-only sign-up (no public signup route) / login / logout / forgot-password.
+4. [x] Customer can submit an intake form → stored in `intake_submissions`, **editable**
+   (a v1 restriction that was lifted once tested — see below).
+5. [~] Customer `/portal` shows their submission (editable) — but not a separate
+   `project_settings` record; that table exists in the schema but has no UI yet.
+6. [ ] Admin `/admin` lists all submissions (read-only), behind `admin` role + MFA —
+   still a stub. **Next up.**
+7. [ ] `audit_log` writes on intake submit + settings update — table + RLS exist,
+   nothing writes to it yet.
+8. [x] CI pipeline + branch protection + secret scanning.
 
-**Out of scope for v1** (next phases): pipeline stages, notes/activity feed, email
-notifications on new intake, file uploads, multiple projects per customer, admin edit
-of records, customer MFA enforcement, SSO.
+**Scope that shifted from the original plan** (built once real usage made the need
+clear, not originally in v1):
+- **AI Software Dev feature/platform picker** with a live, market-researched cost
+  estimate (`lib/feature-catalog.ts`) — the intake form is now much richer than plain
+  free text for that division
+- **Public `/pricing`** page — same calculator, no sign-in required
+- **Email notifications on submit *and* edit** — originally deferred to a later phase,
+  built now since the customer/admin loop needed it to be useful in practice
+- **Build-scope brief** generated per submission (recommended stack + security
+  checklist from selected features) — a head start on what was "admin edit of
+  records," feeding a future `/admin` view instead of being fully deferred
 
 **Definition of done for v1**
-- A brand-new customer can sign up, submit intake, and see their stored settings.
-- That customer provably cannot read another customer's data (RLS verified by test).
-- You can log in as admin (with MFA) and see all submissions.
-- CI is green; no secrets in the repo; `main` is protected.
+- [x] A brand-new customer can sign up (via invite), submit intake, and see it stored.
+- [ ] That customer provably cannot read another customer's data — RLS is deny-by-default
+  and enforces this by construction, but there's no automated **test** proving it yet.
+- [ ] You can log in as admin (with MFA) and see all submissions — admin login works;
+  MFA and the submissions list are still open.
+- [x] CI is green; no secrets in the repo; `main` is protected.
 
 ---
 
@@ -225,10 +252,14 @@ site keeps working throughout.
 
 ## 7. Phased roadmap
 
-- **Phase 0 (this doc):** scoping + decisions. ← we are here
-- **Phase 1:** Next.js migration, marketing parity, CI + branch protection.
-- **Phase 2:** Supabase, auth, RLS, v1 vertical slice (§5).
-- **Phase 3:** CRM depth — statuses, notes, admin editing, email notifications.
+- **Phase 0:** scoping + decisions. ✅ Done.
+- **Phase 1:** Next.js migration, marketing parity, CI + branch protection. ✅ Done, live.
+- **Phase 2:** Supabase, auth, RLS, v1 vertical slice (§5). **Mostly done, live in
+  prod** — auth, schema/RLS, intake (with the feature picker + pricing calculator
+  pulled forward from Phase 3), edit capability, email notifications. Remaining:
+  `/admin` submissions list, MFA, the RLS isolation test. ← we are here
+- **Phase 3:** CRM depth — pipeline statuses, notes/activity feed, `project_settings`
+  UI. Email notifications already shipped in Phase 2, ahead of schedule.
 - **Phase 4:** SOC 2 hardening — policies, audit tooling (Vanta/Drata), pen test.
 - **Backlog (future phases, unscheduled):** billing/payments, contract e-signing,
   ticketing/support, customer-to-customer collaboration, mobile app, public API.
