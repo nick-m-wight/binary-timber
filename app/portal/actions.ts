@@ -14,7 +14,7 @@ import {
 } from "@/lib/feature-catalog";
 import { escapeHtml, sendEmail, EMAIL_LOGO_URL } from "@/lib/email";
 
-const ADMIN_EMAIL = "nick.m.wight@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
 
 function formatUSD(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });

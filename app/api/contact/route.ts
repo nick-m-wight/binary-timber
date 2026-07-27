@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   `;
 
   const { success } = await sendEmail({
-    to: "nick.m.wight@gmail.com",
+    to: process.env.ADMIN_EMAIL!,
     replyTo: email as string,
     subject: `New inquiry — ${escapeHtml(interest)} — Binary Timber Holdings`,
     html,
