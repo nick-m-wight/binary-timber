@@ -1,26 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
-import Link from "next/link";
 import Reveal from "./reveal";
 import ContactForm from "./contact-form";
+import SiteNav from "./site-nav";
 
 export default function Home() {
   return (
     <>
       <Reveal />
-
-      <nav aria-label="Main navigation">
-        <Link href="/" className="logo" aria-label="Binary Timber Holdings — Home">
-          <img src="/hort.png" alt="Binary Timber Holdings" className="logo-img" />
-        </Link>
-        <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#showcase">Showcase</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><Link href="/pricing">Pricing</Link></li>
-          <li><Link href="/auth/login">Sign In</Link></li>
-        </ul>
-      </nav>
+      <SiteNav />
 
       <main>
         <section className="hero" aria-labelledby="hero-heading">
