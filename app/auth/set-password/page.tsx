@@ -10,7 +10,7 @@ export default async function SetPasswordPage() {
   return (
     <main className="auth-card">
       <h1>Set your password</h1>
-      <p>Welcome — set a password to finish setting up your account.</p>
+      <p>Enter a new password below.</p>
       <SetPasswordForm />
     </main>
   );

@@ -10,7 +10,7 @@ export default async function PortalPage() {
   const email = data.claims.email as string | undefined;
 
   return (
-    <main style={{ maxWidth: 640, margin: "6rem auto", padding: "0 1.5rem" }}>
+    <main className="app-page">
       <h1>Welcome{email ? `, ${email}` : ""}</h1>
       <p>Intake and project settings land here next.</p>
       <form action={logout}>

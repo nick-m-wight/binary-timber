@@ -17,7 +17,7 @@ export default async function AdminPage() {
   if (profile?.role !== "admin") redirect("/portal");
 
   return (
-    <main style={{ maxWidth: 640, margin: "6rem auto", padding: "0 1.5rem" }}>
+    <main className="app-page">
       <h1>Admin</h1>
       <p>Customer submissions list lands here next.</p>
       <form action={logout}>
