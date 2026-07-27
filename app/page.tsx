@@ -17,6 +17,7 @@ export default function Home() {
           <li><a href="#projects">Projects</a></li>
           <li><a href="#showcase">Showcase</a></li>
           <li><a href="#contact">Contact</a></li>
+          <li><Link href="/pricing">Pricing</Link></li>
           <li><Link href="/auth/login">Sign In</Link></li>
         </ul>
       </nav>
