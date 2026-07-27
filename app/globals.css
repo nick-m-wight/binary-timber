@@ -753,6 +753,125 @@ button:disabled {
   overflow-wrap: break-word;
 }
 
+/* label/input/textarea/select/button default to the dark .contact palette
+   (--terminal-glow/--paper) — .app-page sits on the light --bg background,
+   so it needs the light-appropriate equivalents instead. Button is left
+   alone: its solid background+text pairing already has its own contrast,
+   independent of the surrounding page. */
+.app-page label {
+  color: var(--ink-soft);
+}
+
+.app-page input,
+.app-page textarea,
+.app-page select {
+  border-bottom-color: rgba(26, 22, 18, 0.3);
+  color: var(--ink);
+}
+
+.app-page input:focus,
+.app-page textarea:focus,
+.app-page select:focus {
+  border-bottom-color: var(--terminal);
+}
+
+.app-page-card {
+  border: 1px solid var(--grid);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.app-page-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-soft);
+  margin-top: 1rem;
+}
+
+.app-page-card-label:first-child { margin-top: 0; }
+
+.app-page-card-value {
+  margin-top: 0.4rem;
+  white-space: pre-wrap;
+}
+
+/* Checkboxes/radios shouldn't get the text-input border-bottom treatment
+   from the global `input` rule — reset them back to native rendering. */
+.app-page input[type="checkbox"],
+.app-page input[type="radio"] {
+  all: revert;
+  width: auto;
+  margin-right: 0.6rem;
+  accent-color: var(--terminal);
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.app-page .feature-list label,
+.app-page .platform-options label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.feature-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.feature-row-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.platform-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.estimate-box {
+  background: var(--bg-deep);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.estimate-box-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink-soft);
+}
+
+.estimate-box-value {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  color: var(--ink);
+  margin-top: 0.3rem;
+}
+
 .form-message {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
