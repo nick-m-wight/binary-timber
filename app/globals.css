@@ -743,7 +743,9 @@ button:disabled {
 
 .app-page {
   max-width: 640px;
-  margin: 6rem auto;
+  /* top clears the fixed nav (measured ~170px on desktop) with room to
+     spare; narrowed back down for the ~71px mobile nav below. */
+  margin: 12rem auto 6rem;
   padding: 0 1.5rem;
 }
 
@@ -945,6 +947,7 @@ footer {
   nav { padding: 1rem 1.25rem; flex-wrap: wrap; row-gap: 0.6rem; }
   .logo-img { height: 34px; }
   nav ul { flex-wrap: wrap; row-gap: 0.5rem; gap: 0.7rem; font-size: 0.58rem; }
+  .app-page { margin-top: 7rem; }
 
   .hero {
     grid-template-columns: 1fr;

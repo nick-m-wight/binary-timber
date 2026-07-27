@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
+import AppNav from "../app-nav";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -17,12 +18,15 @@ export default async function AdminPage() {
   if (profile?.role !== "admin") redirect("/portal");
 
   return (
-    <main className="app-page">
-      <h1>Admin</h1>
-      <p>Customer submissions list lands here next.</p>
-      <form action={logout}>
-        <button type="submit">Sign out</button>
-      </form>
-    </main>
+    <>
+      <AppNav />
+      <main className="app-page">
+        <h1>Admin</h1>
+        <p>Customer submissions list lands here next.</p>
+        <form action={logout}>
+          <button type="submit">Sign out</button>
+        </form>
+      </main>
+    </>
   );
 }

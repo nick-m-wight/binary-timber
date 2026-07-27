@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
+import AppNav from "../app-nav";
 import PortalContent from "./portal-content";
 import type { IntakePayload } from "./actions";
 
@@ -22,14 +23,17 @@ export default async function PortalPage() {
   const submission = submissions?.[0];
 
   return (
-    <main className="app-page">
-      <h1>Welcome{email ? `, ${email}` : ""}</h1>
+    <>
+      <AppNav />
+      <main className="app-page">
+        <h1>Welcome{email ? `, ${email}` : ""}</h1>
 
-      <PortalContent submission={submission ? (submission.payload as IntakePayload) : null} />
+        <PortalContent submission={submission ? (submission.payload as IntakePayload) : null} />
 
-      <form action={logout}>
-        <button type="submit">Sign out</button>
-      </form>
-    </main>
+        <form action={logout}>
+          <button type="submit">Sign out</button>
+        </form>
+      </main>
+    </>
   );
 }
