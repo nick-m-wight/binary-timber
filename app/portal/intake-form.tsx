@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { submitIntake, type IntakeActionState } from "./actions";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { submitIntake, type IntakeActionState, type IntakePayload } from "./actions";
 import { BASE_ESTIMATE, FEATURES, PLATFORMS, computeEstimate } from "@/lib/feature-catalog";
 
 const initialState: IntakeActionState = { error: null };
@@ -10,14 +10,30 @@ function formatUSD(n: number) {
   return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 }
 
-export default function IntakeForm() {
+type IntakeFormProps = {
+  initialValues?: IntakePayload;
+  onSuccess?: () => void;
+};
+
+export default function IntakeForm({ initialValues, onSuccess }: IntakeFormProps) {
   const [state, formAction, pending] = useActionState(submitIntake, initialState);
-  const [division, setDivision] = useState("AI Software");
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  const [platform, setPlatform] = useState<string>("web");
+  const [division, setDivision] = useState<string>(initialValues?.division ?? "AI Software");
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>(
+    initialValues?.selectedFeatures ?? [],
+  );
+  const [platform, setPlatform] = useState<string>(initialValues?.platform ?? "web");
+
+  const wasPending = useRef(false);
+  useEffect(() => {
+    if (wasPending.current && !pending && !state.error) {
+      onSuccess?.();
+    }
+    wasPending.current = pending;
+  }, [pending, state.error, onSuccess]);
 
   const showPicker = division === "AI Software" || division === "Both";
   const estimate = computeEstimate(selectedFeatures, platform);
+  const isEdit = !!initialValues;
 
   function toggleFeature(id: string) {
     setSelectedFeatures((prev) =>
@@ -29,7 +45,14 @@ export default function IntakeForm() {
     <form action={formAction}>
       <div className="form-group">
         <label htmlFor="projectName">Project name</label>
-        <input type="text" id="projectName" name="projectName" required maxLength={200} />
+        <input
+          type="text"
+          id="projectName"
+          name="projectName"
+          required
+          maxLength={200}
+          defaultValue={initialValues?.projectName}
+        />
       </div>
 
       <div className="form-group">
@@ -48,7 +71,13 @@ export default function IntakeForm() {
 
       <div className="form-group">
         <label htmlFor="description">Project description</label>
-        <textarea id="description" name="description" required maxLength={5000}></textarea>
+        <textarea
+          id="description"
+          name="description"
+          required
+          maxLength={5000}
+          defaultValue={initialValues?.description}
+        ></textarea>
       </div>
 
       {showPicker && (
@@ -113,7 +142,7 @@ export default function IntakeForm() {
         </p>
       )}
       <button type="submit" disabled={pending}>
-        {pending ? "Submitting..." : "Submit"}
+        {pending ? "Saving..." : isEdit ? "Save changes" : "Submit"}
       </button>
     </form>
   );

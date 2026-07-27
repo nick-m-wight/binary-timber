@@ -83,13 +83,23 @@ export async function submitIntake(
     payload.buildScope = generateBuildScope(parsed.data.selectedFeatures, parsed.data.platform);
   }
 
-  // status: 'new' is required by the intake_submissions RLS insert policy
-  // (customers can only insert as 'new' — see the migration for why).
-  const { error } = await supabase.from("intake_submissions").insert({
-    customer_id: userId,
-    status: "new",
-    payload,
-  });
+  // One submission per customer — check for an existing row rather than
+  // trusting anything client-supplied about whether this is an edit.
+  const { data: existing } = await supabase
+    .from("intake_submissions")
+    .select("id")
+    .eq("customer_id", userId)
+    .limit(1)
+    .maybeSingle();
+
+  const isEdit = !!existing;
+
+  // status: 'new' is required by the RLS insert/update policies (customers
+  // can only write as 'new' — see the migrations for why). Editing always
+  // resets status to 'new', flagging the change for another admin look.
+  const { error } = isEdit
+    ? await supabase.from("intake_submissions").update({ status: "new", payload }).eq("id", existing.id)
+    : await supabase.from("intake_submissions").insert({ customer_id: userId, status: "new", payload });
 
   if (error) {
     return { error: "Something went wrong. Please try again." };
@@ -146,11 +156,13 @@ export async function submitIntake(
     customerEmail
       ? sendEmail({
           to: customerEmail,
-          subject: "We've received your project inquiry — Binary Timber Holdings",
+          subject: isEdit
+            ? "We've received your updated project details — Binary Timber Holdings"
+            : "We've received your project inquiry — Binary Timber Holdings",
           html: `
             <div style="font-family:Georgia,serif;max-width:600px;color:#1a1612;">
               ${emailHeader}
-              <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">Thanks for reaching out</h2>
+              <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">${isEdit ? "Thanks for the update" : "Thanks for reaching out"}</h2>
               <p>Here's a summary of what you submitted — we'll be in touch soon.</p>
               ${summaryTable}
               ${featuresHtml}
@@ -162,13 +174,14 @@ export async function submitIntake(
     sendEmail({
       to: ADMIN_EMAIL,
       replyTo: customerEmail,
-      subject: `New intake submission — ${escapeHtml(payload.projectName)}`,
+      subject: `${isEdit ? "Updated" : "New"} intake submission — ${escapeHtml(payload.projectName)}`,
       html: `
         <div style="font-family:Georgia,serif;max-width:600px;color:#1a1612;">
           ${emailHeader}
-          <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">New intake submission</h2>
+          <h2 style="font-size:1.2rem;margin-bottom:0.5rem;">${isEdit ? "Updated intake submission" : "New intake submission"}</h2>
           <p><strong>From:</strong> ${escapeHtml(customerEmail ?? "unknown")}</p>
           ${summaryTable}
+          ${featuresHtml}
           ${estimateHtml}
           ${needsPicker ? generateBuildScopeHtml(parsed.data.selectedFeatures, parsed.data.platform) : ""}
         </div>
