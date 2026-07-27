@@ -8,9 +8,9 @@ export default async function SetPasswordPage() {
   if (!data?.claims) redirect("/auth/login");
 
   return (
-    <main style={{ maxWidth: 420, margin: "6rem auto", padding: "0 1.5rem" }}>
+    <main className="auth-card">
       <h1>Set your password</h1>
-      <p>Welcome — set a password to finish setting up your account.</p>
+      <p>Enter a new password below.</p>
       <SetPasswordForm />
     </main>
   );

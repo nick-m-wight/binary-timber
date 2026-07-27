@@ -705,6 +705,54 @@ button:disabled {
   box-shadow: none;
 }
 
+/* ─── AUTH ─────────────────────────────────────────────────────────────────── */
+/* label/input/button rely on the dark .contact palette (--ink/--paper/
+   --terminal-glow) for contrast — auth pages sit outside .contact, so they
+   need their own dark card rather than the plain light page background. */
+
+.auth-card {
+  background: var(--ink);
+  color: var(--paper);
+  max-width: 420px;
+  margin: 6rem auto;
+  padding: 3rem 2.5rem;
+  border-radius: 4px;
+}
+
+.auth-card h1 {
+  color: var(--paper);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.auth-card p {
+  color: rgba(250, 246, 236, 0.75);
+  margin-bottom: 1.5rem;
+}
+
+.auth-link {
+  margin-top: -0.5rem;
+}
+
+.auth-link a {
+  color: var(--terminal-glow);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.app-page {
+  max-width: 640px;
+  margin: 6rem auto;
+  padding: 0 1.5rem;
+}
+
+.app-page h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  overflow-wrap: break-word;
+}
+
 .form-message {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;

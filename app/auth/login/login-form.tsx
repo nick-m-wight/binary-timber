@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { login, type AuthActionState } from "../actions";
 
@@ -24,6 +25,9 @@ export default function LoginForm() {
           autoComplete="current-password"
         />
       </div>
+      <p className="auth-link">
+        <Link href="/auth/forgot-password">Forgot password?</Link>
+      </p>
       {state.error && (
         <p role="alert" className="form-message show error">
           {state.error}
